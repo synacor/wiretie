@@ -111,7 +111,7 @@ The signature for `wire()` consists of three arguments, all of which are optiona
 ```js
 wire(
     // the property in context where a model instance exists
-    <String> namespace,
+    <String> contextNamespace,
     // maps incoming props to model method call descriptors
     <Function|Object> mapToProps,
     // maps model properties/methods to props
@@ -373,7 +373,7 @@ This allows (but importantly abstracts) context access, and manages re-rendering
 
 **Parameters**
 
--   `namespace` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** The context property at which to obtain a model instance. If empty, all of `context` is used.
+-   `contextNamespace` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** The context property at which to obtain a model instance. If empty, all of `context` is used.
 -   `mapToProps` **([Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function))?** Maps incoming props to model method call descriptors: `['method.name', ...args]` (optional, default `{}`)
 -   `mapModelToProps` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** Maps model properties/methods to props: `model => ({ prop: model.property })` (optional, default `noop`)
 

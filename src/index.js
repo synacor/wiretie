@@ -7,7 +7,7 @@ import { join, get, shallowEqual, removeKeyFromObject, noop } from './util';
  *	`wire()` is simply a formalization of what is typically done as side-effects within `componentDidMount()`.
  *
  *	@name wire
- *	@param {String} [namespace]				The context property at which to obtain a model instance. If empty, all of `context` is used.
+ *	@param {String} [contextNamespace]				The context property at which to obtain a model instance. If empty, all of `context` is used.
  *	@param {Object|Function} [mapToProps]	Maps incoming props to model method call descriptors: `['method.name', ...args]`
  *	@param {Function} [mapModelToProps]		Maps model properties/methods to props: `model => ({ prop: model.property })`
  *	@returns {Function} wiring(Child) -> WireDataWrapper<Child>
@@ -52,7 +52,7 @@ import { join, get, shallowEqual, removeKeyFromObject, noop } from './util';
  *		</Provider>
  *	);
  */
-export default function wire(namespace, mapToProps={}, mapModelToProps=noop) {
+export default function wire(contextNamespace, mapToProps={}, mapModelToProps=noop) {
 	const CACHE = {};
 
 	return Child => class WireDataWrapper extends Component {
@@ -66,7 +66,7 @@ export default function wire(namespace, mapToProps={}, mapModelToProps=noop) {
 			this.tracking = {};
 			this.counter = 0;
 
-			this.mapping = mapModelToProps(get(context, namespace), props);
+			this.mapping = mapModelToProps(get(context, contextNamespace), props);
 
 			this.refresh = () => {
 				this.invoke(this.props, false, true);
@@ -78,7 +78,7 @@ export default function wire(namespace, mapToProps={}, mapModelToProps=noop) {
 		}
 
 		invoke(props, keysOnly, refresh) {
-			let source = get(this.context, namespace),
+			let source = get(this.context, contextNamespace),
 				isFunction = typeof mapToProps==='function',
 				mapping = isFunction ? mapToProps(props) : mapToProps,
 				keys = [];
@@ -94,7 +94,7 @@ export default function wire(namespace, mapToProps={}, mapModelToProps=noop) {
 					args = args.map( p => typeof p==='string' && p in props ? props[p] : p );
 				}
 
-				let key = JSON.stringify([namespace, path, ...args]);
+				let key = JSON.stringify([contextNamespace, path, ...args]);
 				keys.push(key);
 				if (keysOnly) continue;
 
@@ -113,7 +113,7 @@ export default function wire(namespace, mapToProps={}, mapModelToProps=noop) {
 				}
 				else {
 					let fn = delve(source, path);
-					if (!fn) throw Error(`${namespace}.${path} not found.`);
+					if (!fn) throw Error(`${contextNamespace}.${path} not found.`);
 					p = fn(...args);
 				}
 

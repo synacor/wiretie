@@ -12,6 +12,7 @@
     "optimize": "uglifyjs $npm_package_main -bc dead_code --pure-funcs _possibleConstructorReturn _classCallCheck -o $npm_package_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_main}.map",
     "minify": "uglifyjs $npm_package_main -mc collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code --pure-funcs _possibleConstructorReturn _classCallCheck -o $npm_package_minified_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_minified_main}.map",
     "test": "eslint {src,test} && mocha --compilers js:babel-register test/**/*.js",
+    "test:watch": "mocha --compilers js:babel-register -w test/**/*.js",
     "docs": "documentation readme src/index.js --section API -q",
     "prepublish": "npm run build",
     "release": "npm run build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
