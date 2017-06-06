@@ -31,7 +31,7 @@ export function removeKeyFromObject(key, obj) {
 		obj = { ...obj };
 		delete obj[key];
 	}
-	return obj;
+	return Object.keys(obj).length ? obj : undefined;
 }
 
 /** An empty function.
