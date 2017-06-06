@@ -6,10 +6,10 @@ It's a streamlined way to write async components that avoids complex side effect
 
 Here's what it does for your code:
 
-![Example source code: before & after](example.png)
 
 [![npm](https://img.shields.io/npm/v/preact-context-provider.svg)](http://npm.im/wiretie)
 [![Build Status](https://travis-ci.org/synacor/wiretie.svg?branch=master)](https://travis-ci.org/synacor/wiretie)
+![Example source code: before & after](resources/example.png)
 
 ## Features
 
