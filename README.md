@@ -1,5 +1,7 @@
 # `wiretie`
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/synacor/wiretie.svg)](https://greenkeeper.io/)
+
 `wire()` is a Higher Order Component for [Preact][] that resolves (async) values from a model and passes them down as props.
 
 It's a streamlined way to write async components that avoids complex side effects within `componentDidMount()`, and encourages proper instantiability.
