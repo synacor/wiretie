@@ -1,0 +1,85 @@
+{
+  "name": "wiretie",
+  "amdName": "wire",
+  "version": "1.0.0",
+  "description": "Higher Order Component for Preact that resolves (async) values from a model and passes them down as props.",
+  "main": "dist/wiretie.js",
+  "minified:main": "dist/wiretie.min.js",
+  "jsnext:main": "src/index.js",
+  "scripts": {
+    "build": "npm-run-all transpile optimize minify docs",
+    "transpile": "rollup -c -m ${npm_package_main}.map -f umd -n $npm_package_amdName $npm_package_jsnext_main -o $npm_package_main",
+    "optimize": "uglifyjs $npm_package_main -bc dead_code --pure-funcs _possibleConstructorReturn _classCallCheck -o $npm_package_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_main}.map",
+    "minify": "uglifyjs $npm_package_main -mc collapse_vars,evaluate,screw_ie8,unsafe,loops=false,keep_fargs=false,pure_getters,unused,dead_code --pure-funcs _possibleConstructorReturn _classCallCheck -o $npm_package_minified_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_minified_main}.map",
+    "test": "eslint {src,test} && mocha --compilers js:babel-register test/**/*.js",
+    "docs": "documentation readme src/index.js --section API -q",
+    "prepublish": "npm run build",
+    "release": "npm run build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-class-properties",
+      [
+        "transform-react-jsx",
+        {
+          "pragma": "h"
+        }
+      ]
+    ]
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-synacor"
+  },
+  "keywords": [
+    "wire",
+    "model",
+    "connect",
+    "prop provider",
+    "context",
+    "preact"
+  ],
+  "files": [
+    "src",
+    "dist"
+  ],
+  "author": "Jason Miller <jasonmiller@synacor.com>",
+  "license": "BSD 3-Clause",
+  "repository": "synacor/wiretie",
+  "homepage": "https://github.com/synacor/wiretie",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-eslint": "^7.1.0",
+    "babel-plugin-transform-class-properties": "^6.18.0",
+    "babel-plugin-transform-es2015-classes-simple": "^1.0.0",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "documentation": "^4.0.0-beta.18",
+    "eslint": "^3.10.2",
+    "eslint-config-synacor": "^1.0.0",
+    "eslint-plugin-react": "^6.7.1",
+    "mocha": "^3.1.2",
+    "npm-run-all": "^4.0.2",
+    "preact": "^7.2.0",
+    "rollup": "^0.41.5",
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-es3": "^1.0.3",
+    "rollup-plugin-post-replace": "^1.0.0",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.8.0",
+    "uglify-js": "^2.7.4",
+    "undom": "^0.3.1"
+  },
+  "peerDependencies": {
+    "preact": "*"
+  },
+  "dependencies": {
+    "dlv": "^1.1.0"
+  }
+}
