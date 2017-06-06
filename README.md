@@ -423,3 +423,22 @@ render(
 ```
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** wiring(Child) -> WireDataWrapper<Child>
+
+### props
+
+Props passed to your wrapped component.
+
+#### pending
+
+If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
+If there are no pending promises, `props.pending` is `undefined`.
+
+#### rejected
+
+If any Promises have been rejected, their values are available in a `props.rejected` Object.
+If there are no rejected promises, `props.rejected` is `undefined`.
+
+#### refresh
+
+A `refresh()` method is passed down as a prop.
+Invoking this method re-fetches all data props, bypassing the cache.
