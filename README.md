@@ -1,15 +1,16 @@
-# `wiretie`
+<p align="center">
+  <img src="resources/wiretie.png" width="400" height="135" alt="Wiretie">
+  <br>
+  <a href="https://www.npmjs.org/package/wiretie"><img src="https://img.shields.io/npm/v/wiretie.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/synacor/wiretie"><img src="https://travis-ci.org/synacor/wiretie.svg?branch=master" alt="travis"></a>
+</p>
 
-`wire()` is a Higher Order Component for [Preact][] that resolves (async) values from a model and passes them down as props.
+Wiretie is a Higher Order Component for [Preact][] that resolves (async) values from a model and passes them down as props. It lets you `wire()` components up to data sources.
 
-It's a streamlined way to write async components that avoids complex side effects within `componentDidMount()`, and encourages proper instantiability.
+This provides a uniform and streamlined way to write async components that avoids complex side effects within `componentDidMount()`, and encourages proper instantiability.
 
 Here's what it does for your code:
 
-![Example source code: before & after](example.png)
-
-[![npm](https://img.shields.io/npm/v/preact-context-provider.svg)](http://npm.im/wiretie)
-[![Build Status](https://travis-ci.org/synacor/wiretie.svg?branch=master)](https://travis-ci.org/synacor/wiretie)
+![Example source code: before & after](resources/example.png)
 
 ## Features
 
@@ -422,3 +423,22 @@ render(
 ```
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** wiring(Child) -> WireDataWrapper<Child>
+
+### props
+
+Props passed to your wrapped component.
+
+#### pending
+
+If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
+If there are no pending promises, `props.pending` is `undefined`.
+
+#### rejected
+
+If any Promises have been rejected, their values are available in a `props.rejected` Object.
+If there are no rejected promises, `props.rejected` is `undefined`.
+
+#### refresh
+
+A `refresh()` method is passed down as a prop.
+Invoking this method re-fetches all data props, bypassing the cache.

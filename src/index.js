@@ -7,7 +7,7 @@ import { join, get, shallowEqual, removeKeyFromObject, noop } from './util';
  *	`wire()` is simply a formalization of what is typically done as side-effects within `componentDidMount()`.
  *
  *	@name wire
- *	@param {String} [contextNamespace]				The context property at which to obtain a model instance. If empty, all of `context` is used.
+ *	@param {String} [contextNamespace]		The context property at which to obtain a model instance. If empty, all of `context` is used.
  *	@param {Object|Function} [mapToProps]	Maps incoming props to model method call descriptors: `['method.name', ...args]`
  *	@param {Function} [mapModelToProps]		Maps model properties/methods to props: `model => ({ prop: model.property })`
  *	@returns {Function} wiring(Child) -> WireDataWrapper<Child>
@@ -68,6 +68,30 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 
 			this.mapping = mapModelToProps(get(context, contextNamespace), props);
 
+			/** Props passed to your wrapped component.
+			 *	@name props
+			 */
+
+			/** If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
+  			 *	If there are no pending promises, `props.pending` is `undefined`.
+			 *	@name pending
+			 *	@memberof props
+			 *	@type {Object<Boolean>|undefined}
+			 */
+
+			/** If any Promises have been rejected, their values are available in a `props.rejected` Object.
+ 			 *	If there are no rejected promises, `props.rejected` is `undefined`.
+ 			 *	@name rejected
+			 *	@memberof props
+ 			 *	@type {Object<Error>|undefined}
+ 			 */
+
+			/** A `refresh()` method is passed down as a prop.
+			 *	Invoking this method re-fetches all data props, bypassing the cache.
+			 *	@name refresh
+			 *	@memberof props
+			 *	@function
+			 */
 			this.refresh = () => {
 				this.invoke(this.props, false, true);
 			};
