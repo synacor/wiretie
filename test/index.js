@@ -3,19 +3,9 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import 'undom/register';
 import { h, render } from 'preact';
+import Provider from 'preact-context-provider';
 import wire from '../src';
 chai.use(sinonChai);
-
-class Provider {
-	getChildContext() {
-		let { ...context } = this.props;
-		delete context.children;
-		return context;
-	}
-	render({ children }) {
-		return children[0];
-	}
-}
 
 /** @jsx h */
 
