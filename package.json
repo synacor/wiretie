@@ -1,7 +1,7 @@
 {
   "name": "wiretie",
   "amdName": "wire",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Higher Order Component for Preact that resolves (async) values from a model and passes them down as props.",
   "main": "dist/wiretie.js",
   "minified:main": "dist/wiretie.min.js",
