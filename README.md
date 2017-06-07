@@ -121,6 +121,8 @@ wire(
 ```
 
 > See [Full `wire()` documentation](#wire) for parameter details.
+>
+> 🤓 Want to dive straight in? Start with this [Wiretie Codepen Example](https://codepen.io/developit/pen/WOvzzY?editors=0010).
 
 ### Usage With Functional Components
 
