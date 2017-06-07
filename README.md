@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="resources/wiretie.png" width="400" height="135" alt="Wiretie">
+  <img src="resources/wiretie.png" width="400" alt="Wiretie">
   <br>
   <a href="https://www.npmjs.org/package/wiretie"><img src="https://img.shields.io/npm/v/wiretie.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/synacor/wiretie"><img src="https://travis-ci.org/synacor/wiretie.svg?branch=master" alt="travis"></a>
 </p>
