@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import delve from 'dlv';
-import { join, get, shallowEqual, removeKeyFromObject, noop } from './util';
+import { join, get, shallowEqual, removeKeyFromObject, assign, noop } from './util'; // eslint-disable-line no-unused-vars
 
 /**	Creates a higher order component that resolves (async) values from a model to props.
  *	This allows (but importantly abstracts) context access, and manages re-rendering in response to resolved data.
@@ -55,172 +55,174 @@ import { join, get, shallowEqual, removeKeyFromObject, noop } from './util';
 export default function wire(contextNamespace, mapToProps={}, mapModelToProps=noop) {
 	const CACHE = {};
 
-	return Child => class WireDataWrapper extends Component {
-		constructor(props, context) {
-			super(props, context);
+	return Child => (
+		class WireDataWrapper extends Component {
+			constructor(props, context) {
+				super(props, context);
 
-			this.state = {};
-			this.currentKeys = {};
+				this.state = {};
+				this.currentKeys = {};
 
-			// used for creating unique IDs.
-			this.tracking = {};
-			this.counter = 0;
+				// used for creating unique IDs.
+				this.tracking = {};
+				this.counter = 0;
 
-			this.mapping = mapModelToProps(get(context, contextNamespace), props);
+				this.mapping = mapModelToProps(get(context, contextNamespace), props);
 
-			/** Props passed to your wrapped component.
-			 *	@name props
-			 */
+				/** Props passed to your wrapped component.
+				 *	@name props
+				 */
 
-			/** If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
-  			 *	If there are no pending promises, `props.pending` is `undefined`.
-			 *	@name pending
-			 *	@memberof props
-			 *	@type {Object<Boolean>|undefined}
-			 */
+				/** If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
+	  			 *	If there are no pending promises, `props.pending` is `undefined`.
+				 *	@name pending
+				 *	@memberof props
+				 *	@type {Object<Boolean>|undefined}
+				 */
 
-			/** If any Promises have been rejected, their values are available in a `props.rejected` Object.
- 			 *	If there are no rejected promises, `props.rejected` is `undefined`.
- 			 *	@name rejected
-			 *	@memberof props
- 			 *	@type {Object<Error>|undefined}
- 			 */
+				/** If any Promises have been rejected, their values are available in a `props.rejected` Object.
+	 			 *	If there are no rejected promises, `props.rejected` is `undefined`.
+	 			 *	@name rejected
+				 *	@memberof props
+	 			 *	@type {Object<Error>|undefined}
+	 			 */
 
-			/** A `refresh()` method is passed down as a prop.
-			 *	Invoking this method re-fetches all data props, bypassing the cache.
-			 *	@name refresh
-			 *	@memberof props
-			 *	@function
-			 */
-			this.refresh = () => {
-				this.invoke(this.props, false, true);
-			};
-		}
+				/** A `refresh()` method is passed down as a prop.
+				 *	Invoking this method re-fetches all data props, bypassing the cache.
+				 *	@name refresh
+				 *	@memberof props
+				 *	@function
+				 */
+				this.refresh = () => {
+					this.invoke(this.props, false, true);
+				};
+			}
 
-		shouldComponentUpdate(props, state) {
-			return !shallowEqual(props, this.props) || !shallowEqual(state, this.state);
-		}
+			shouldComponentUpdate(props, state) {
+				return !shallowEqual(props, this.props) || !shallowEqual(state, this.state);
+			}
 
-		invoke(props, keysOnly, refresh) {
-			let source = get(this.context, contextNamespace),
-				isFunction = typeof mapToProps==='function',
-				mapping = isFunction ? mapToProps(props) : mapToProps,
-				keys = [];
+			invoke(props, keysOnly, refresh) {
+				let source = get(this.context, contextNamespace),
+					isFunction = typeof mapToProps==='function',
+					mapping = isFunction ? mapToProps(props) : mapToProps,
+					keys = [];
 
-			for (let prop in mapping) if (mapping.hasOwnProperty(prop)) {
-				let path = mapping[prop],
-					args = [];
-				if (Array.isArray(path)) {
-					args = path.slice(1);
-					path = path[0];
-				}
-				if (!isFunction) {
-					args = args.map( p => typeof p==='string' && p in props ? props[p] : p );
-				}
-
-				let key = JSON.stringify([contextNamespace, path, ...args]);
-				keys.push(key);
-				if (keysOnly) continue;
-
-				if (!refresh && this.currentKeys[prop]===key) {
-					continue;
-				}
-
-				this.currentKeys[prop] = key;
-
-				let p;
-				if (typeof path==='function') {
-					p = path();
-				}
-				else if (typeof path!=='string') {
-					p = path;
-				}
-				else {
-					let fn = delve(source, path);
-					if (!fn) throw Error(`${contextNamespace}.${path} not found.`);
-					p = fn(...args);
-				}
-
-				if (p && p.then!==undefined && p.__wiretieResolved) {
-					p = p.__wiretieResolved;
-				}
-
-				// magically re-render for async values:
-				if (p && p.then!==undefined) {
-
-					let newState = {};
-					let { pending, rejected } = this.state;
-
-					// set that this property call is pending if not already set
-					if (!pending) {
-						newState.pending = { [prop]: true };
+				for (let prop in mapping) if (mapping.hasOwnProperty(prop)) {
+					let path = mapping[prop],
+						args = [];
+					if (Array.isArray(path)) {
+						args = path.slice(1);
+						path = path[0];
 					}
-					else if (!pending[prop]) {
-						newState.pending = { ...pending, [prop]: true };
+					if (!isFunction) {
+						args = args.map( p => typeof p==='string' && p in props ? props[p] : p );
 					}
 
-					// Since we're starting a new call for prop, remove any old rejected status for it if it exists
-					if (rejected && rejected[prop]) {
-						newState.rejected = removeKeyFromObject(prop, rejected);
+					let key = JSON.stringify([contextNamespace, path, ...args]);
+					keys.push(key);
+					if (keysOnly) continue;
+
+					if (!refresh && this.currentKeys[prop]===key) {
+						continue;
 					}
 
-					let id = ++this.counter;
-					this.tracking[prop] = id;
+					this.currentKeys[prop] = key;
 
-					// handle the promise results
-					p.then( data => {
-						p.__wiretieResolved = data;
+					let p;
+					if (typeof path==='function') {
+						p = path();
+					}
+					else if (typeof path!=='string') {
+						p = path;
+					}
+					else {
+						let fn = delve(source, path);
+						if (!fn) throw Error(`${contextNamespace}.${path} not found.`);
+						p = fn(...args);
+					}
 
-						// cache the result if the promise resolved successfully
+					if (p && p.then!==undefined && p.__wiretieResolved) {
+						p = p.__wiretieResolved;
+					}
+
+					// magically re-render for async values:
+					if (p && p.then!==undefined) {
+
 						let newState = {};
-						newState[prop] = CACHE[key] = data;
-						return newState;
-					}).catch( err => {
-						if (this.tracking[prop]!==id) return;
+						let { pending, rejected } = this.state;
 
-						// If there was an error, use the cached value if available and set the rejected property
-						let rejected = this.state.rejected && { ...this.state.rejected } || {};
-						rejected[prop] = err;
-						let newState = { rejected };
-						if (CACHE[key]) newState[prop] = CACHE[key];
-						return newState;
-					}).then( newState => {
-						if (this.tracking[prop]!==id) return;
-						delete this.tracking[prop];
+						// set that this property call is pending if not already set
+						if (!pending) {
+							newState.pending = { [prop]: true };
+						}
+						else if (!pending[prop]) {
+							newState.pending = { ...pending, [prop]: true };
+						}
 
-						// remove the pending key for this prop if necessary
-						let pending = this.state.pending;
-						if (pending && pending[prop]) newState.pending = removeKeyFromObject(prop, pending);
+						// Since we're starting a new call for prop, remove any old rejected status for it if it exists
+						if (rejected && rejected[prop]) {
+							newState.rejected = removeKeyFromObject(prop, rejected);
+						}
+
+						let id = ++this.counter;
+						this.tracking[prop] = id;
+
+						// handle the promise results
+						p.then( data => {
+							p.__wiretieResolved = data;
+
+							// cache the result if the promise resolved successfully
+							let newState = {};
+							newState[prop] = CACHE[key] = data;
+							return newState;
+						}).catch( err => {
+							if (this.tracking[prop]!==id) return;
+
+							// If there was an error, use the cached value if available and set the rejected property
+							let rejected = this.state.rejected && { ...this.state.rejected } || {};
+							rejected[prop] = err;
+							let newState = { rejected };
+							if (CACHE[key]) newState[prop] = CACHE[key];
+							return newState;
+						}).then( newState => {
+							if (this.tracking[prop]!==id) return;
+							delete this.tracking[prop];
+
+							// remove the pending key for this prop if necessary
+							let pending = this.state.pending;
+							if (pending && pending[prop]) newState.pending = removeKeyFromObject(prop, pending);
+							this.setState(newState);
+						});
+
+						// if we got a Promise but there's a cached value, use that until the new value comes in:
+						if (typeof CACHE[key] !== 'undefined') {
+							newState[prop] = CACHE[key];
+						}
 						this.setState(newState);
-					});
-
-					// if we got a Promise but there's a cached value, use that until the new value comes in:
-					if (typeof CACHE[key] !== 'undefined') {
-						newState[prop] = CACHE[key];
 					}
-					this.setState(newState);
+					else {
+						//for non-promises, just set the state with the value
+						this.setState({ [prop]: p });
+					}
 				}
-				else {
-					//for non-promises, just set the state with the value
-					this.setState({ [prop]: p });
+
+				return this.keys = keys;
+			}
+
+			componentWillMount() {
+				this.invoke(this.props);
+			}
+
+			componentWillReceiveProps(nextProps) {
+				if (!shallowEqual(nextProps, this.props) && join(this.keys)!==join(this.invoke(nextProps, true))) {
+					this.invoke(nextProps);
 				}
 			}
 
-			return this.keys = keys;
-		}
-
-		componentWillMount() {
-			this.invoke(this.props);
-		}
-
-		componentWillReceiveProps(nextProps) {
-			if (!shallowEqual(nextProps, this.props) && join(this.keys)!==join(this.invoke(nextProps, true))) {
-				this.invoke(nextProps);
+			render(props, state) {
+				return <Child refresh={this.refresh} {...this.mapping} {...props} {...state} />;
 			}
 		}
-
-		render(props, state) {
-			return <Child refresh={this.refresh} {...this.mapping} {...props} {...state} />;
-		}
-	};
+	);
 }
