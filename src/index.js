@@ -177,7 +177,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 
 							this.setState(state);
 							return state;
-						}
+						};
 
 
 						// handle the promise results
@@ -187,7 +187,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 							// cache the result if the promise resolved successfully
 							let newState = {};
 							newState[prop] = CACHE[key] = data;
-							return after(newState);
+							return newState;
 						}).catch( err => {
 							if (this.tracking[prop]!==id) return;
 
@@ -198,7 +198,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 							if (CACHE[key]) newState[prop] = CACHE[key];
 							after(newState);
 							return Promise.reject(err);
-						})
+						}).then(after);
 
 						// if we got a Promise but there's a cached value, use that until the new value comes in:
 						if (typeof CACHE[key] !== 'undefined') {
