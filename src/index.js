@@ -167,6 +167,18 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 
 						let id = ++this.counter;
 						this.tracking[prop] = id;
+						const after = (state) => {
+							if (this.tracking[prop]!==id) return;
+							delete this.tracking[prop];
+
+							// remove the pending key for this prop if necessary
+							let pending = this.state.pending;
+							if (pending && pending[prop]) state.pending = removeKeyFromObject(prop, pending);
+
+							this.setState(state);
+							return state;
+						}
+
 
 						// handle the promise results
 						p.then( data => {
@@ -175,7 +187,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 							// cache the result if the promise resolved successfully
 							let newState = {};
 							newState[prop] = CACHE[key] = data;
-							return newState;
+							return after(newState);
 						}).catch( err => {
 							if (this.tracking[prop]!==id) return;
 
@@ -184,16 +196,9 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 							rejected[prop] = err;
 							let newState = { rejected };
 							if (CACHE[key]) newState[prop] = CACHE[key];
-							return newState;
-						}).then( newState => {
-							if (this.tracking[prop]!==id) return;
-							delete this.tracking[prop];
-
-							// remove the pending key for this prop if necessary
-							let pending = this.state.pending;
-							if (pending && pending[prop]) newState.pending = removeKeyFromObject(prop, pending);
-							this.setState(newState);
-						});
+							after(newState);
+							return Promise.reject(err);
+						})
 
 						// if we got a Promise but there's a cached value, use that until the new value comes in:
 						if (typeof CACHE[key] !== 'undefined') {
