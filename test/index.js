@@ -115,6 +115,7 @@ describe('wiretie', () => {
 			});
 
 			it('should ignore rejection of outdated Promises', done => {
+
 				let callback;
 				const foo = { bar: spy( () => new Promise( (resolve, reject) => { callback = reject; }) ) };
 				const Child = stub().returns(<div />);
@@ -167,23 +168,25 @@ describe('wiretie', () => {
 					bar: ['bar', props.a]
 				}))(Child);
 				mount(<Provider foo={foo}><Connected a="a" /></Provider>);
-				foo.bar = stub().returns(Promise.resolve('two'));
+				expect(Child).to.have.been.calledOnce.and.calledWithMatch({ a: 'a', pending: { bar: true } });
 				Child.reset();
-				mount(<Provider foo={foo}><Connected a="b" /></Provider>);
 
+				foo.bar = stub().returns(Promise.resolve('two'));
+				mount(<Provider foo={foo}><Connected a="b" /></Provider>);
 				expect(Child).to.have.been.calledOnce.and.calledWithMatch({ a: 'b', pending: { bar: true } });
-				Child.reset();
 
 				// rejecting the first promise after the second is synchronously resolved at initialization causes them to occur out-of-order.
 				// without tracking, this leaves the first Promise's value as what we use for rendering:
 				callback('one');
 
 				setTimeout( () => {
-					expect(Child).to.have.been.calledOnce.and.calledWithMatch({ a: 'b', bar: 'two', pending: undefined });
+					expect(Child).to.have.been.calledTwice;
+					expect(Child.secondCall).to.have.been.calledWithMatch({ a: 'b', bar: 'two', pending: undefined });
+					Child.reset();
 
 					let callback;
 					foo.bar = spy( () => new Promise( resolve => { callback = resolve; }) );
-					Child.reset();
+
 					mount(<Provider foo={foo}><Connected a="c" /></Provider>);
 					expect(Child).to.have.been.calledOnce.and.calledWithMatch({ a: 'c', pending: { bar: true }, rejected: undefined });
 
@@ -197,8 +200,8 @@ describe('wiretie', () => {
 
 					setTimeout( () => {
 						expect(Child).to.have.been.calledTwice;
-						expect(Child.secondCall).to.have.been.calledWithMatch({ a: 'd', bar: 'two', pending: undefined, rejected: { bar: 'error!' } });
-
+						//bar is undefined because we never successfully had a cached value for a="d" before the promise rejection
+						expect(Child.secondCall).to.have.been.calledWithMatch({ a: 'd', bar: undefined, pending: undefined, rejected: { bar: 'error!' } });
 						done();
 					});
 				});
