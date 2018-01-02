@@ -57,50 +57,6 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 
 	return Child => (
 		class WireDataWrapper extends Component {
-			constructor(props, context) {
-				super(props, context);
-
-				this.state = {};
-				this.currentKeys = {};
-
-				// used for creating unique IDs.
-				this.tracking = {};
-				this.counter = 0;
-
-				this.mapping = mapModelToProps(get(context, contextNamespace), props);
-
-				/** Props passed to your wrapped component.
-				 *	@name props
-				 */
-
-				/** If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
-	  			 *	If there are no pending promises, `props.pending` is `undefined`.
-				 *	@name pending
-				 *	@memberof props
-				 *	@type {Object<Boolean>|undefined}
-				 */
-
-				/** If any Promises have been rejected, their values are available in a `props.rejected` Object.
-	 			 *	If there are no rejected promises, `props.rejected` is `undefined`.
-	 			 *	@name rejected
-				 *	@memberof props
-	 			 *	@type {Object<Error>|undefined}
-	 			 */
-
-				/** A `refresh()` method is passed down as a prop.
-				 *	Invoking this method re-fetches all data props, bypassing the cache.
-				 *	@name refresh
-				 *	@memberof props
-				 *	@function
-				 */
-				this.refresh = () => {
-					this.invoke(this.props, false, true);
-				};
-			}
-
-			shouldComponentUpdate(props, state) {
-				return !shallowEqual(props, this.props) || !shallowEqual(state, this.state);
-			}
 
 			invoke(props, keysOnly, refresh) {
 				let source = get(this.context, contextNamespace),
@@ -210,6 +166,47 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 				return this.keys = keys;
 			}
 
+			constructor(props, context) {
+				super(props, context);
+
+				this.state = {};
+				this.currentKeys = {};
+
+				// used for creating unique IDs.
+				this.tracking = {};
+				this.counter = 0;
+
+				this.mapping = mapModelToProps(get(context, contextNamespace), props);
+
+				/** Props passed to your wrapped component.
+				 *	@name props
+				 */
+
+				/** If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
+	  			 *	If there are no pending promises, `props.pending` is `undefined`.
+				 *	@name pending
+				 *	@memberof props
+				 *	@type {Object<Boolean>|undefined}
+				 */
+
+				/** If any Promises have been rejected, their values are available in a `props.rejected` Object.
+	 			 *	If there are no rejected promises, `props.rejected` is `undefined`.
+	 			 *	@name rejected
+				 *	@memberof props
+	 			 *	@type {Object<Error>|undefined}
+	 			 */
+
+				/** A `refresh()` method is passed down as a prop.
+				 *	Invoking this method re-fetches all data props, bypassing the cache.
+				 *	@name refresh
+				 *	@memberof props
+				 *	@function
+				 */
+				this.refresh = () => {
+					this.invoke(this.props, false, true);
+				};
+			}
+
 			componentWillMount() {
 				this.invoke(this.props);
 			}
@@ -218,6 +215,10 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 				if (!shallowEqual(nextProps, this.props) && join(this.keys)!==join(this.invoke(nextProps, true))) {
 					this.invoke(nextProps);
 				}
+			}
+
+			shouldComponentUpdate(props, state) {
+				return !shallowEqual(props, this.props) || !shallowEqual(state, this.state);
 			}
 
 			render(props, state) {
