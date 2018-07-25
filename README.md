@@ -2,6 +2,7 @@
   <img src="resources/wiretie.png" width="400" alt="Wiretie">
   <br>
   <a href="https://www.npmjs.org/package/wiretie"><img src="https://img.shields.io/npm/v/wiretie.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/synacor/wiretie"><img src="https://travis-ci.org/synacor/wiretie.svg?branch=master" alt="travis"></a>
+<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fsynacor%2Fwiretie?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsynacor%2Fwiretie.svg?type=shield"/></a>
 </p>
 
 Wiretie is a Higher Order Component for [Preact][] that resolves (async) values from a model and passes them down as props. It lets you `wire()` components up to data sources.
@@ -444,3 +445,7 @@ If there are no rejected promises, `props.rejected` is `undefined`.
 
 If any Promises are pending, the corresponding prop names will be keys in a `props.pending` Object.
 If there are no pending promises, `props.pending` is `undefined`.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsynacor%2Fwiretie.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsynacor%2Fwiretie?ref=badge_large)
