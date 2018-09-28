@@ -308,7 +308,8 @@ Somewhere up the tree (often your root component or an `app.js`):
 ```js
 import { h, Component } from 'preact';
 import Provider from 'preact-context-provider';
-import hardwareModel from './hardware-model';
+import hardwareModel from './hardware';
+import BatteryLevel from './battery-level';
 
 export default class App extends Component {
     hardware = hardwareModel();
@@ -316,7 +317,7 @@ export default class App extends Component {
     render() {
         return (
             <Provider hardware={this.hardware}>
-                <App />
+                <BatteryLevel />
             </Provider>
         );
     }
@@ -329,6 +330,7 @@ _Note the first argument to `wire()` is the namespace of our model in context - 
 
 ```js
 import { h, Component } from 'preact';
+import wire from 'wiretie';
 
 // Descendants of <Provider /> can subscribe to data from the model instance:
 @wire('hardware', { batteryLevel: 'battery.getLevel' })
