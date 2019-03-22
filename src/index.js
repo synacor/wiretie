@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import delve from 'dlv';
-import { join, get, shallowEqual, removeKeyFromObject, assign, noop } from './util'; // eslint-disable-line no-unused-vars
+import { join, get, shallowEqual, removeKeyFromObject, noop, assign } from './util'; // eslint-disable-line no-unused-vars
 
 /**	Creates a higher order component that resolves (async) values from a model to props.
  *	This allows (but importantly abstracts) context access, and manages re-rendering in response to resolved data.
@@ -222,7 +222,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 			}
 
 			render(props, state) {
-				return <Child refresh={this.refresh} {...this.mapping} {...props} {...state} />;
+				return h(Child, { refresh: this.refresh, ...this.mapping, ...props, ...state });
 			}
 		}
 	);
