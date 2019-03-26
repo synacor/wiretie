@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import delve from 'dlv';
 import { join, get, shallowEqual, removeKeyFromObject, noop, assign } from './util'; // eslint-disable-line no-unused-vars
 
-/**	Creates a higher order component that resolves (async) values from a model to props.
+/**	Creates a higher order component (HOC) that resolves (async) values from a model to props.
  *	This allows (but importantly abstracts) context access, and manages re-rendering in response to resolved data.
  *	`wire()` is simply a formalization of what is typically done as side-effects within `componentDidMount()`.
  *
@@ -10,7 +10,7 @@ import { join, get, shallowEqual, removeKeyFromObject, noop, assign } from './ut
  *	@param {String} [contextNamespace]		The context property at which to obtain a model instance. If empty, all of `context` is used.
  *	@param {Object|Function} [mapToProps]	Maps incoming props to model method call descriptors: `['method.name', ...args]`
  *	@param {Function} [mapModelToProps]		Maps model properties/methods to props: `model => ({ prop: model.property })`
- *	@returns {Function} wiring(Child) -> WireDataWrapper<Child>
+ *	@returns {Function} wiring(Child) -> WireDataWrapper<Child>.  The resulting HOC has a method `getWrappedComponent()` that returns the Child that was wrapped
  *
  *	@example
  *	// resolves news.getTopStories(), passing it down as a "stories" prop
@@ -42,6 +42,9 @@ import { join, get, shallowEqual, removeKeyFromObject, noop, assign } from './ut
  *	// Wrap StoryView in the loader component created by wire()
  *	const Story = withStory(StoryView);
  *
+ *	//Get access to the wrapped Component
+ *	Story.getWrappedComponent() === StoryView; // true
+ *
  *	// Provide a news model into context so Story can wire up to it
  *	render(
  *		<Provider news={newsModel({ origin: '//news.api' })}>
@@ -55,7 +58,7 @@ import { join, get, shallowEqual, removeKeyFromObject, noop, assign } from './ut
 export default function wire(contextNamespace, mapToProps={}, mapModelToProps=noop) {
 	const CACHE = {};
 
-	return Child => (
+	return Child => {
 		class WireDataWrapper extends Component {
 
 			invoke(props, keysOnly, refresh) {
@@ -225,5 +228,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 				return h(Child, { refresh: this.refresh, ...this.mapping, ...props, ...state });
 			}
 		}
-	);
+		WireDataWrapper.getWrappedComponent = Child && Child.getWrappedComponent || (() => Child);
+		return WireDataWrapper;
+	};
 }

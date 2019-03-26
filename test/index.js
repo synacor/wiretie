@@ -25,6 +25,27 @@ describe('wiretie', () => {
 			expect(deco( () => {} )).to.be.a('function');
 		});
 
+		describe('getWrappedComponent()', () => {
+
+			it('should be a function', () => {
+				expect(wire('foo')(spy()).getWrappedComponent).to.be.a('function');
+			});
+
+			it('should return the Child component that it is wrapping', () => {
+				let Foo = spy();
+				let Wrapped = wire('foo')(Foo);
+				expect(Wrapped.getWrappedComponent()).to.equal(Foo);
+			});
+
+			it('should recursively call getWrappedComponent() on Child components to return the first non-decorator Child', () => {
+				let Foo = spy();
+				//Wrap Foo in two layers of configuration to make sure Foo is returned by the top level call to getWrappedComponent
+				let Wrapped = wire('foo')(wire('foo')(Foo));
+				expect(Wrapped.getWrappedComponent()).to.equal(Foo);
+			});
+
+		});
+
 		describe('prop resolution', () => {
 			it('should not re-render if nothing required resolution', done => {
 				const foo = {};

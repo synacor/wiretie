@@ -383,7 +383,7 @@ render(<App />);
 
 ### wire
 
-Creates a higher order component that resolves (async) values from a model to props.
+Creates a higher order component (HOC) that resolves (async) values from a model to props.
 This allows (but importantly abstracts) context access, and manages re-rendering in response to resolved data.
 `wire()` is simply a formalization of what is typically done as side-effects within `componentDidMount()`.
 
@@ -426,6 +426,9 @@ const StoryView = ({ story }) => (
 // Wrap StoryView in the loader component created by wire()
 const Story = withStory(StoryView);
 
+//Get access to the wrapped Component
+Story.getWrappedComponent() === StoryView; // true
+
 // Provide a news model into context so Story can wire up to it
 render(
 	<Provider news={newsModel({ origin: '//news.api' })}>
@@ -437,7 +440,7 @@ render(
 );
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** wiring(Child) -> WireDataWrapper<Child>
+Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** wiring(Child) -> WireDataWrapper<Child>.  The resulting HOC has a method `getWrappedComponent()` that returns the Child that was wrapped
 
 ### props
 
