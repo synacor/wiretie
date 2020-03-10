@@ -16,7 +16,17 @@ describe('wiretie', () => {
 		mount = jsx => root = render(jsx, scratch, root),
 		root;
 
-	beforeEach( () => mount( () => null ) );
+	//swallow unhandled rejection messages for our unit tests, but expose a handler that can be defined and called on rejection in tests
+	let unhandledRejectionHandler;
+	let urh = (...args) => unhandledRejectionHandler && unhandledRejectionHandler(...args);
+
+	beforeEach( () => {
+		mount( () => null );
+		unhandledRejectionHandler = undefined;
+		process.on('unhandledRejection', urh);
+	});
+
+	afterEach(() => process.removeListener('unhandledRejection', urh));
 
 	describe('wire()', () => {
 		it('should return a function', () => {
@@ -105,6 +115,17 @@ describe('wiretie', () => {
 					expect(Child.secondCall).to.have.been.calledWithMatch({ a: 'b', pending: undefined, rejected: { bar: 'BAR' } });
 					done();
 				});
+			});
+
+			it('should catch errors and log them as unhandled promise rejections so the user can see in the console that something went wrong', done => {
+				//this test will timeout if the unhandled promise rejection warning does not occur
+				unhandledRejectionHandler = () => {	done();	};
+				const foo = { bar: stub().returns(Promise.reject('BAR')) };
+				const Child = stub().returns(<div />);
+				const Connected = wire('foo', props => ({
+					bar: ['bar', props.a]
+				}))(Child);
+				mount(<Provider foo={foo}><Connected a="b" /></Provider>);
 			});
 
 			it('should reset errors for subsequent success', done => {

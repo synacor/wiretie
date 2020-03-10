@@ -143,6 +143,10 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 							rejected[prop] = err;
 							let newState = { rejected };
 							if (CACHE[key]) newState[prop] = CACHE[key];
+
+							//Anonymous rejection to log to the console
+							Promise.reject(err);
+
 							return newState;
 						}).then( newState => {
 							if (this.tracking[prop]!==id) return;
