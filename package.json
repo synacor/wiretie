@@ -47,34 +47,34 @@
     "dist"
   ],
   "author": "Jason Miller <jasonmiller@synacor.com>",
-  "license": "BSD 3-Clause",
+  "license": "BSD-3-Clause",
   "repository": "synacor/wiretie",
   "homepage": "https://github.com/synacor/wiretie",
   "devDependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/plugin-transform-react-jsx": "^7.3.0",
-    "@babel/preset-env": "^7.4.2",
-    "@babel/register": "^7.4.0",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-transform-react-jsx": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/register": "^7.8.6",
     "chai": "^4.2.0",
-    "documentation": "^9.3.1",
-    "eslint": "^5.15.3",
-    "eslint-config-synacor": "^3.0.3",
-    "mocha": "^6.0.2",
+    "documentation": "^12.1.4",
+    "eslint": "^6.8.0",
+    "eslint-config-synacor": "^3.0.5",
+    "mocha": "^7.1.0",
     "npm-run-all": "^4.1.5",
     "preact": "^8.4.2",
-    "preact-context-provider": "^1.1.1",
-    "rollup": "^1.7.0",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-buble": "^0.19.6",
-    "sinon": "^7.3.0",
-    "sinon-chai": "^3.3.0",
-    "uglify-js": "^3.5.1",
+    "preact-context-provider": "^1.2.1",
+    "rollup": "^1.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-buble": "^0.19.8",
+    "sinon": "^9.0.1",
+    "sinon-chai": "^3.5.0",
+    "uglify-js": "^3.8.0",
     "undom": "^0.4.0"
   },
   "peerDependencies": {
     "preact": "*"
   },
   "dependencies": {
-    "dlv": "^1.1.2"
+    "dlv": "^1.1.3"
   }
 }

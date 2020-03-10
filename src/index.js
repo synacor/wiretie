@@ -67,7 +67,7 @@ export default function wire(contextNamespace, mapToProps={}, mapModelToProps=no
 					mapping = isFunction ? mapToProps(props) : mapToProps,
 					keys = [];
 
-				for (let prop in mapping) if (mapping.hasOwnProperty(prop)) {
+				for (let prop in mapping) if (Object.prototype.hasOwnProperty.call(mapping, prop)) {
 					let path = mapping[prop],
 						args = [];
 					if (Array.isArray(path)) {

@@ -27,7 +27,7 @@ export function shallowEqual(a, b) {
  *	@private
  */
 export function removeKeyFromObject(key, obj) {
-	if (obj.hasOwnProperty(key)) {
+	if (Object.prototype.hasOwnProperty.call(obj, key)) {
 		obj = { ...obj };
 		delete obj[key];
 	}
